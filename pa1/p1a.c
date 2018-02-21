@@ -17,7 +17,7 @@ void main()
 	{
  		sa=op1;
  		lc=sa;
- 		printf("\t%s\t%s\t%d\n",la,m1,op1);
+ 		printf("\t%s\t%s\t%x\n",la,m1,op1);
  	}
  
 	else
