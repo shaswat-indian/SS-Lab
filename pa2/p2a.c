@@ -75,12 +75,6 @@ void main()
 			}
 			else if(operand[0]=='C')
 			{
-				int l=strlen(operand)-3;
-				while(l<3)
-				{
-					fprintf(f4,"00");
-					l++;
-				}
 				for(int i=2;i<strlen(operand)-1;i++)
 				{
 					fprintf(f4,"%02X",operand[i]);
