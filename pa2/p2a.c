@@ -99,4 +99,5 @@ void main()
 
 	printf("\nOutput File generated as output.txt\n");
 	fclose(f1);
+	fclose(f4);
 }
