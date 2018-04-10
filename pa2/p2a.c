@@ -1,82 +1,102 @@
 //Pass-2 of two-pass assembler
 #include<stdio.h>
 #include<string.h>
-#include<ctype.h>
 
 void main()
 {
-	FILE *fint,*ftab,*flen,*fsym;
-	int op1[10],txtlen,txtlen1,i,j=0,len;
-	char add[5],symadd[5],op[5],temp[30],line[20],label[20],mne[10],symtab[10],opmne[10],start[10],operand[10];
-	fint=fopen("op1.txt","r");
-	flen=fopen("length.txt","r");
-	ftab=fopen("optab.txt","r");
-	fsym=fopen("symbol.txt","r");
-	fscanf(fint,"%s %s %s %s",add,label,mne,operand);
-
-	if(strcmp(mne,"START")==0)
+	FILE *f1,*f2,*f3,*f4;
+	char label[20],opcode[20],operand[20];
+	int address,sa;
+	f1=fopen("interip.txt","r");
+	f4=fopen("output.txt","w");
+	fscanf(f1,"%x %s %s %s",&address,label,opcode,operand);
+	if(strcmp(opcode,"START")==0)
 	{
-		strcpy(start,operand);
-		fscanf(flen,"%d",&len);
+		fprintf(f4,"%X\t%s\t%s\t%s\n",address,label,opcode,operand);
 	}
-
-	printf("H^%s^%s^%d\nT^00%s^",label,start,len,start);
-	fscanf(fint,"%s %s %s %s",add,label,mne,operand);
-
-	while(strcmp(mne,"END")!=0)
+	
+	fscanf(f1,"%x %s %s %s",&address,label,opcode,operand);
+	while(strcmp(opcode,"END")!=0)
 	{
-		fscanf(ftab,"%s %s",opmne,op);
-		
-		while(!feof(ftab))
+		fprintf(f4,"%X\t%s\t%s\t%s\t",address,label,opcode,operand);
+		f2=fopen("optab.txt","r");
+		char tempcode[20],tempval[20];
+		fscanf(f2,"%s %s",tempcode,tempval);
+		while(!feof(f2))
 		{
-			
-			if(strcmp(mne,opmne)==0)
+			if(strcmp(opcode,tempcode)==0)
 			{
-				fclose(ftab);
-				fscanf(fsym,"%s %s",symadd,symtab);
-				while(!feof(fsym))
-				{
-					if(strcmp(operand,symtab)==0)
-					{
-						printf("%s%s^",op,symadd);
-						fclose(fsym);
-						break;
-					}
-					else
-						fscanf(fsym,"%s %s",symadd,symtab);
-				}
+				fprintf(f4,"%s",tempval);
 				break;
 			}
 			else
-				fscanf(ftab,"%s%s",opmne,op);
+				fscanf(f2,"%s %s",tempcode,tempval);
+		}
+		fclose(f2);
+
+		f3=fopen("symtab.txt","r");
+		char symcode[20],symval[20];
+		fscanf(f3,"%s %s",symcode,symval);
+		while(!feof(f3))
+		{
+			if(strcmp(operand,symcode)==0)
+			{
+				fprintf(f4,"%s\n",symval);
+				break;
+			}
+			else
+				fscanf(f3,"%s %s",symcode,symval);
+			
+		}
+		fclose(f3);
+
+		if(strcmp(opcode,"WORD")==0)
+		{
+			int val=strtol(operand,NULL,16);
+			char num[10];
+			sprintf(num,"%X",val);
+			int l=strlen(num);
+			while(l<6)
+			{
+				fprintf(f4,"0");
+				l++;
+			}
+			fprintf(f4,"%s\n",num);
 		}
 
-		if((strcmp(mne,"BYTE")==0)||(strcmp(mne,"WORD")==0))
+		if(strcmp(opcode,"BYTE")==0)
 		{
-			if(strcmp(mne,"WORD")==0)
-				printf("00000%s^",operand);
-			else
-    			{
-				len=strlen(operand);
-				for(i=2;i<len-1;i++)
+			if(operand[0]=='X')
+			{
+				fprintf(f4,"0000");
+				for(int i=2;i<strlen(operand)-1;i++)
+					fprintf(f4,"%c",operand[i]);
+				fprintf(f4,"\n");
+			}
+			else if(operand[0]=='C')
+			{
+				int l=strlen(operand)-3;
+				while(l<3)
 				{
-					printf("%d",operand[i]);
+					fprintf(f4,"00");
+					l++;
 				}
-				printf("^");
+				for(int i=2;i<strlen(operand)-1;i++)
+				{
+					fprintf(f4,"%02X",operand[i]);
+				}
+				fprintf(f4,"\n");
 			}
 		}
-		
-		fscanf(fint,"%s %s %s %s",add,label,mne,operand);
-		ftab=fopen("optab.txt","r");
-		fsym=fopen("symbol.txt","r");
-		fseek(ftab,SEEK_SET,0);
-	}
 
-	printf("\nE^00%s",start);
-	fclose(fint);
-	fclose(ftab);
-	fclose(fsym);
-	fclose(flen);
-	printf("\n");
+		if(strcmp(opcode,"RESB")==0||strcmp(opcode,"RESW")==0)
+			fprintf(f4,"\n");		
+
+		fscanf(f1,"%x %s %s %s",&address,label,opcode,operand);
+
+	}
+	fprintf(f4,"%X\t%s\t%s\t%s\n",address,label,opcode,operand);
+
+	printf("\nOutput File generated as output.txt\n");
+	fclose(f1);
 }
-     
