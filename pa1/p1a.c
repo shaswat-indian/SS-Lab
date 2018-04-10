@@ -1,88 +1,83 @@
 //Pass-1 of two-pass assembler
 #include<stdio.h>
-//#include<conio.h>
 #include<string.h>
 
 void main()
 {
 	FILE *f1,*f2,*f3,*f4;
-	int lc,sa,l,op1,o,len;
-	char m1[20],la[20],op[20],otp[20];
-	//clrscr();
 	f1=fopen("input.txt","r");
 	f3=fopen("symtab.txt","w");
-	fscanf(f1,"%s %s %x",la,m1,&op1);
+	f4=fopen("output.txt","w");
+	int lc,sa;
+	char label[20],opcode[20],operand[20];
+	fscanf(f1,"%s %s %s",label,opcode,operand);
 
-	if(strcmp(m1,"START")==0)
+	if(strcmp(opcode,"START")==0)
 	{
- 		sa=op1;
- 		lc=sa;
- 		printf("\t%s\t%s\t%x\n",la,m1,op1);
- 	}
- 
+		sa=strtol(operand,NULL,16);
+		fprintf(f4,"%X\t%s\t%s\t%s\n",sa,label,opcode,operand);
+	}
 	else
- 		lc=0;
+		sa=0;
+	lc=sa;
 
-	fscanf(f1,"%s %s",la,m1);
-	while(!feof(f1))
+	fscanf(f1,"%s %s %s",label,opcode,operand);
+	while(strcmp(opcode,"END")!=0)
 	{
-		fscanf(f1,"%s",op);
-	 	printf("\n%x\t%s\t%s\t%s\n",lc,la,m1,op);
-
-		if(strcmp(la,"-")!=0)
- 		{
- 			fprintf(f3,"\n%x\t%s\n",lc,la);
- 		}
-
+		fprintf(f4,"%X\t%s\t%s\t%s\n",lc,label,opcode,operand);
+		
+		if(strcmp(label,"-")!=0)
+		{
+			fprintf(f3,"%s\t%X\n",label,lc);
+		}
+		
+		char tempcode[20],tempval[20];
 		f2=fopen("optab.txt","r");
- 		fscanf(f2,"%s %d",otp,&o);
-
- 		while(!feof(f2))
- 		{
-  			if(strcmp(m1,otp)==0)
-  			{
-    				lc=lc+3;
-    				break;
-  			}
-  
-			fscanf(f2,"%s %d",otp,&o);
-  		}
-
-  		fclose(f2);
-  		if(strcmp(m1,"WORD")==0)
-     		{
-   			lc=lc+3;
-   		}
-   		else if(strcmp(m1,"RESW")==0)
-   		{
-    			op1=atoi(op);
-    			lc=lc+(3*op1);
-    		}
-    		else if(strcmp(m1,"BYTE")==0)
-    		{
-    			if(op[0]=='X')
-      				lc=lc+1;
-      			else
-      			{
-      				len=strlen(op)-2;
-      				lc=lc+len;
+		fscanf(f2,"%s %s",tempcode,tempval);
+		while(!feof(f2))
+		{
+			if(strcmp(opcode,tempcode)==0)
+			{
+				lc+=3;
+				break;
 			}
-    		}
-    		else if(strcmp(m1,"RESB")==0)
-    		{
-     			op1=atoi(op);
-     			lc=lc+op1;
-     		}
-	
-    		fscanf(f1,"%s%s",la,m1);
-    	}
+			fscanf(f2,"%s %s",tempcode,tempval);
+		}
+		fclose(f2);
 
-    	if(strcmp(m1,"END")==0)
-    	{
-    		printf("Program length = %d\n",lc-sa);
-    	}
+		if(strcmp(opcode,"WORD")==0)
+		{
+			lc+=3;
+		}
 
+		if(strcmp(opcode,"RESW")==0)
+		{
+			lc=lc+(3*(strtol(operand,NULL,10)));
+		}
+
+		if(strcmp(opcode,"RESB")==0)
+		{
+			lc=lc+strtol(operand,NULL,10);
+		}
+
+		if(strcmp(opcode,"BYTE")==0)
+		{
+			if(opcode[0]=='X')
+				lc++;
+			else
+				lc=lc+strlen(operand)-3;
+		}
+
+
+
+		fscanf(f1,"%s %s %s",label,opcode,operand);
+
+
+	}
+	fprintf(f4,"%X\t%s\t%s\t%s\n",lc,label,opcode,operand);
+
+	printf("\nOutput File generated as output.txt\n");
 	fclose(f1);
+	fclose(f4);
 	fclose(f3);
-	//getch();
 }
