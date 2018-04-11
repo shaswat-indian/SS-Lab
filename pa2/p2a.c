@@ -68,7 +68,6 @@ void main()
 		{
 			if(operand[0]=='X')
 			{
-				fprintf(f4,"0000");
 				for(int i=2;i<strlen(operand)-1;i++)
 					fprintf(f4,"%c",operand[i]);
 				fprintf(f4,"\n");
