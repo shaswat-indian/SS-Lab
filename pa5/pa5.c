@@ -1,3 +1,4 @@
+//One-pass macroprocessor
 #include<stdio.h>
 #include<string.h>
 
