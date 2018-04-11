@@ -117,13 +117,12 @@ void main()
 	
 	strcpy(temp,"");
 	strcpy(textrec,"T 00");
-	strcat(textrec,saddress);
-	strcat(temp," ");	
+	strcat(textrec,saddress);	
 	while(strcmp(opcode,"END")!=0)
 	{
-		if((textlen==30)||(strcmp(opcode,"RESW")==0)||(strcmp(opcode,"RESB")==0)||(strlen(objcode)+textlen)>30)
+		if((textlen==30)||(strcmp(opcode,"RESW")==0)||(strcmp(opcode,"RESB")==0)||(((strlen(objcode)/2)+textlen)>30))
 		{
-			printf("%s %02x %s\n",textrec,textlen,temp);
+			printf("%s %02X %s\n",textrec,textlen,temp);
 			textlen=0;
 			strcpy(temp,"");
 			strcpy(textrec,"T 00");
@@ -133,12 +132,12 @@ void main()
 				strcat(textrec,saddress);
 				strcat(temp,objcode);
 				strcat(temp," ");
-				textlen=textlen+strlen(objcode);	
+				textlen=textlen+(strlen(objcode)/2);	
 			}
 		}
 		else
 		{
-			textlen=textlen+strlen(objcode);
+			textlen=textlen+(strlen(objcode)/2);
 			strcat(temp,objcode);
 			strcat(temp," ");
 		}
