@@ -1,5 +1,4 @@
 //Absolute loader
-
 #include<stdio.h>
 #include<string.h>
 
@@ -19,8 +18,10 @@ void main()
 	{
 		if(strcmp(input,"T")==0)
 		{
-			fscanf(f1,"%X",&addr);								
+			fscanf(f1,"%X",&addr);	
+			fscanf(f1,"%X",&len);							
 			fscanf(f1,"%s",input);
+			
 		}
 
 		int i=0;
