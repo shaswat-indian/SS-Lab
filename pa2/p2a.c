@@ -6,13 +6,14 @@ void main()
 {
 	FILE *f1,*f2,*f3,*f4;
 	char label[20],opcode[20],operand[20];
-	int address,sa;
+	int address,sa,len;
 	f1=fopen("interip.txt","r");
 	f4=fopen("output.txt","w");
 	fscanf(f1,"%x %s %s %s",&address,label,opcode,operand);
 	if(strcmp(opcode,"START")==0)
 	{
-		fprintf(f4,"%X\t%s\t%s\t%s\n",address,label,opcode,operand);
+		fprintf(f4,"%X\t%s\t%s\t%s\t-\n",address,label,opcode,operand);
+		sa=address;
 	}
 	
 	fscanf(f1,"%x %s %s %s",&address,label,opcode,operand);
@@ -68,12 +69,14 @@ void main()
 		{
 			if(operand[0]=='X')
 			{
+				//fprintf(f4,"0000");
 				for(int i=2;i<strlen(operand)-1;i++)
 					fprintf(f4,"%c",operand[i]);
 				fprintf(f4,"\n");
 			}
 			else if(operand[0]=='C')
 			{
+
 				for(int i=2;i<strlen(operand)-1;i++)
 				{
 					fprintf(f4,"%02X",operand[i]);
@@ -83,14 +86,67 @@ void main()
 		}
 
 		if(strcmp(opcode,"RESB")==0||strcmp(opcode,"RESW")==0)
-			fprintf(f4,"\n");		
+			fprintf(f4,"-\n");		
 
 		fscanf(f1,"%x %s %s %s",&address,label,opcode,operand);
 
 	}
 	fprintf(f4,"%X\t%s\t%s\t%s\n",address,label,opcode,operand);
 
-	printf("\nOutput File generated as output.txt\n");
+	len=address-sa;
+	
+	printf("\nOutput File generated as output.txt\n");	
+
 	fclose(f1);
+	fclose(f4);
+
+	
+	//For Object Program
+
+	int textlen=0;
+	char textrec[80],saddress[20],objcode[20],temp[80],startaddr[20];
+	printf("\nObject Program:-\n\n");
+	f4=fopen("output.txt","r");
+
+	fscanf(f4,"%s %s %s %s %s",saddress,label,opcode,operand,objcode);
+	strcpy(startaddr,saddress);	
+
+	printf("H %s %s %06X\n",label,saddress,len);
+
+	fscanf(f4,"%s %s %s %s %s",saddress,label,opcode,operand,objcode);
+	
+	strcpy(temp,"");
+	strcpy(textrec,"T 00");
+	strcat(textrec,saddress);
+	strcat(temp," ");	
+	while(strcmp(opcode,"END")!=0)
+	{
+		if((textlen==30)||(strcmp(opcode,"RESW")==0)||(strcmp(opcode,"RESB")==0)||(strlen(objcode)+textlen)>30)
+		{
+			printf("%s %02x %s\n",textrec,textlen,temp);
+			textlen=0;
+			strcpy(temp,"");
+			strcpy(textrec,"T 00");
+			fscanf(f4,"%s %s %s %s %s",saddress,label,opcode,operand,objcode);
+			if(strcmp(objcode,"-")!=0)
+			{
+				strcat(textrec,saddress);
+				strcat(temp,objcode);
+				strcat(temp," ");
+				textlen=textlen+strlen(objcode);	
+			}
+		}
+		else
+		{
+			textlen=textlen+strlen(objcode);
+			strcat(temp,objcode);
+			strcat(temp," ");
+		}
+		fscanf(f4,"%s %s %s %s %s",saddress,label,opcode,operand,objcode);
+	}
+	if(textlen!=0)
+		printf("%s %x %s\n",textrec,textlen,temp);
+
+	printf("E 00%s\n\n",startaddr);
 	fclose(f4);
 }
