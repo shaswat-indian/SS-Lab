@@ -1,0 +1,11 @@
+#include<stdio.h>
+void main()
+{
+	int a,b,c,d;
+	printf(a);
+	/* printf(b); */
+	printf(c);
+	/* printf(d); */
+	// Hello
+
+}
