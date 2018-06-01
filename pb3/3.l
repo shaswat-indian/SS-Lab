@@ -44,7 +44,7 @@ void main()
 {
 	printf("\nEnter an Expression: ");
 	yylex();
-	if(v)
+	if(v && j>i)
 	{
 		printf("\nValid Expression\n");
 		printf("\nOperators used are:-\n");
