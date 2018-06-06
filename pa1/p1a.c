@@ -62,7 +62,7 @@ void main()
 
 		if(strcmp(opcode,"BYTE")==0)
 		{
-			if(opcode[0]=='X')
+			if(operand[0]=='X')
 				lc++;
 			else
 				lc=lc+strlen(operand)-3;
