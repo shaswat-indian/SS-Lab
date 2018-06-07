@@ -34,15 +34,29 @@ void main()
 				fscanf(f2,"%s %s",tempcode,tempval);
 		}
 		fclose(f2);
-
+		char actoperand[20];
+		strcpy(actoperand,"");
+		if(operand[strlen(operand)-1]=='X')
+		{
+			int i;
+			for(i=0;i<strlen(operand)-2;i++)
+				actoperand[i]=operand[i];
+			actoperand[i]='\0';
+		}
+		else
+			strcpy(actoperand,operand);
 		f3=fopen("symtab.txt","r");
 		char symcode[20],symval[20];
 		fscanf(f3,"%s %s",symcode,symval);
 		while(!feof(f3))
 		{
-			if(strcmp(operand,symcode)==0)
+			if(strcmp(actoperand,symcode)==0)
 			{
-				fprintf(f4,"%s\n",symval);
+				
+				int lval=strtol(symval,NULL,16);
+				if(operand[strlen(operand)-1]=='X')
+					lval=lval+0x8000;
+				fprintf(f4,"%X\n",lval);
 				break;
 			}
 			else
